@@ -34,13 +34,13 @@ AR = 3.185;
 Beta = sqrt(1-Mach^2);
 eta = C_l_alpha/(2*pi/Beta);
 
-C_L_max = 1.2%.9*1.3*cosd(44.26); %add flap 
+C_L_max = .9*1.3*cosd(44.26);
 
 C_L_alpha = (2*pi*AR)/(2+sqrt(4+((AR^2*Beta^2)/eta^2)*(1+tan(LAMDA)^2/Beta^2)))*7.18;
 
 C_D0 = .05; %C_D0 = C_fe*(S_wet/S_ref) -- C_fe = .0035 t12.3
 
-v_stall = .3*v_cruise%sqrt(2*w/(rho_sl*C_L_max*S_wing));
+v_stall = sqrt(2*w/(rho_sl*C_L_max*S_wing));
 
 q = 0.5 * rho * v_cruise^2;
 q_stall = 0.5 * rho * v_stall^2;
@@ -53,12 +53,8 @@ w_cruise = w*.97*.985;
 w_loiter = w_cruise*.856*.9404;
 w_stall = w_loiter*.995;
 
-ws_cruise_corr = ws_cruise * (w/w_cruise);
+ws_crusie_corr = ws_cruise * (w/w_cruise);
 ws_loiter_corr = ws_loiter * (w/w_loiter);
 ws_stall_corr = ws_stall * (w/w_stall);
 
-S_wing_new = w/ws_stall_corr;
-
-
-TW_cruise = (q*C_D0/ws_cruise_corr)+((ws_cruise_corr)/((pi*AR*e)*q));
-TW_stall = (q_stall*C_D0/ws_stall_corr)+((ws_stall_corr)/((pi*AR*e)*q_stall));
+S_wing_new = ws_stall_corr*
