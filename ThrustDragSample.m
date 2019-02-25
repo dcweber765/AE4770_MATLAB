@@ -81,10 +81,25 @@ S_wet_nacelle = pi * diameter_nacelle * length_nacelle;
 S_wet = S_wet_wing + S_wet_ht + S_wet_vt + S_wet_fuse + 2*S_wet_nacelle + S_wet_radar;
 AR_radome = radar_diameter^2/S_radar;
 %%Cruise Flight
-if alt_cruise > 36090 %%ft, rho in slugs/ft^3
- [temp, rho, mu] = atmosphere_eng_highalt( alt_cruise );
-else
- [temp, rho, mu] = atmosphere_eng_lowalt( alt_cruise );
+h = alt_cruise;
+g = 32.15;                          %Gravitational acceleration [ft/sec^2]
+R = 3089.2;                         %Specific gas constant for dry air [lb*ft/sl*K]
+a1 = -1.9812*10^-3;                 %Temperature gradient [K/ft]
+rho_sl = 0.0023769;                 %Rho at sea level [sl/ft^3]
+tau_sl = 288.16;                    %Standard temperature at sea level [K]
+
+
+
+if h<=36089.2                       %For altitudes 0 - 36089.2 km
+    tau = tau_sl + a1*h;
+    rho = rho_sl * (tau/tau_sl).^(-1-g/(a1*R));
+    mu = 1.8e-6;
+elseif h>36089.2                    %For altitude 36089.2 - 82021 km
+    tau_11 = tau_sl + a1*36089.2;   %Temperature at 36089.2 km
+    rho_11 = rho_sl * (tau/tau_sl).^(-1-g/(a1*R));    %Pressure at 36089.2 km
+    
+    tau = tau_11;
+    rho = rho_11*exp((-g*(h-36089.2))/(R*tau_11));
 end
 q_cruise = 0.5 * rho * v_cruise^2;
 M_cruise = v_cruise_mph / 678;
@@ -287,27 +302,27 @@ WScruise_maxR = q_cruise * sqrt( pi * AR_w * e_0 * CD_0 );
 WScruise_maxR_syms = q_syms * sqrt( pi * AR_w * e_0 * CD_0 );
 T_maxR = ( q_cruise * CD_0 / WScruise_maxR + WScruise_maxR / ( pi * AR_w * e_0 *q_cruise ) ) * w_cruise;
 T_maxR_syms = ( q_syms * CD_0 / WScruise_maxR_syms + WScruise_maxR_syms / ( pi *AR_w * e_0 * q_syms ) ) * w_cruise;
-% figure()
-% fplot([T_syms], [100 450])
-% title("Thrust-Drag Plot")
-% xlabel("Velocity (mph)")
-% ylabel("Thrust and Drag Forces (lbs)")
+figure()
+fplot([T_syms], [100 450])
+title("Thrust-Drag Plot")
+xlabel("Velocity (mph)")
+ylabel("Thrust and Drag Forces (lbs)")
 %%RESULTS
 TD_cruise = T_cruise/D;
 L_shouldbe = w_cruise;
 LD_shouldbe = L_shouldbe/D;
 LD = L_cruise/D;
 TW_inv = 1/TW_cruise;
-% figure()
-% fplot([T_cruise, D_syms], [100 425])
-% title("Thrust-Drag Plot")
-% xlabel("Velocity (mph)")
-% ylabel("Thrust and Drag Forces (lbs)")
-% legend("Req. Thrust for Cruise at 350 mph", "Drag")
-%
-% figure()
-% fplot([T_cruise, T_maxR, D_syms], [100 425])
-% title("Thrust-Drag Plot")
-% xlabel("Velocity (mph)")
-% ylabel("Thrust and Drag Forces (lbs)")
-% legend("Req. Thrust for Cruise at 350 mph", "Req. Thrust for Max. Range", "Drag")
+figure()
+fplot([T_cruise, D_syms], [100 425])
+title("Thrust-Drag Plot")
+xlabel("Velocity (mph)")
+ylabel("Thrust and Drag Forces (lbs)")
+legend("Req. Thrust for Cruise at 350 mph", "Drag")
+
+figure()
+fplot([T_cruise, T_maxR, D_syms], [100 425])
+title("Thrust-Drag Plot")
+xlabel("Velocity (mph)")
+ylabel("Thrust and Drag Forces (lbs)")
+legend("Req. Thrust for Cruise at 350 mph", "Req. Thrust for Max. Range", "Drag")
