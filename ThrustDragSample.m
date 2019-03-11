@@ -87,19 +87,21 @@ R = 3089.2;                         %Specific gas constant for dry air [lb*ft/sl
 a1 = -1.9812*10^-3;                 %Temperature gradient [K/ft]
 rho_sl = 0.0023769;                 %Rho at sea level [sl/ft^3]
 tau_sl = 288.16;                    %Standard temperature at sea level [K]
-
+mu_sl = 3.737E-7; 
+S_mu = 110.4;
 
 
 if h<=36089.2                       %For altitudes 0 - 36089.2 km
     tau = tau_sl + a1*h;
     rho = rho_sl * (tau/tau_sl).^(-1-g/(a1*R));
-    mu = 1.8e-6;
+    mu = mu_sl*(tau/tau_sl)^3/2 * ((tau_sl + S_mu)/ (tau + S_mu));
 elseif h>36089.2                    %For altitude 36089.2 - 82021 km
     tau_11 = tau_sl + a1*36089.2;   %Temperature at 36089.2 km
     rho_11 = rho_sl * (tau/tau_sl).^(-1-g/(a1*R));    %Pressure at 36089.2 km
     
     tau = tau_11;
     rho = rho_11*exp((-g*(h-36089.2))/(R*tau_11));
+     mu = mu_sl*(tau/tau_sl)^3/2 * ((tau_sl + S_mu)/ (tau + S_mu));
 end
 q_cruise = 0.5 * rho * v_cruise^2;
 M_cruise = v_cruise_mph / 678;
@@ -285,12 +287,12 @@ D_0 = (CD_0 + CD_engfail) * q_cruise * S_w;
 D_0_syms = CD_0_syms * q_syms * S_w;
 D = D_0 + D_ind;
 D_syms = D_0_syms + D_ind_syms;
-% figure()
-% fplot([D_syms, D_0_syms, D_ind_syms], [120 450])
-% title("Drag Plot")
-% xlabel("Velocity (mph)")
-% ylabel("Drag Force (lbs)")
-% legend("Total Drag", "Parasitic Drag", "Induced Drag")
+figure()
+fplot([D_syms, D_0_syms, D_ind_syms], [120 450])
+title("Drag Plot")
+xlabel("Velocity (mph)")
+ylabel("Drag Force (lbs)")
+legend("Total Drag", "Parasitic Drag", "Induced Drag")
 %%Step 7: Thrust
 TW_cruise = q_cruise * CD_02 / WS_cruise + WS_cruise / ( pi * AR_w * e_0 * q_cruise );
 TW_syms = q_syms * CD_02_syms / WS_cruise + WS_cruise / ( pi * AR_w * e_0 * q_syms );

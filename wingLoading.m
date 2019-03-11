@@ -3,6 +3,8 @@ clear all;
 h = 30000;
 w = 1.6028e+04;
 S_wing = w/50;
+alpha = 2;
+alpha_0 = -2.35;
 
 g = 32.15;                          %Gravitational acceleration [ft/sec^2]
 R = 3089.2;                         %Specific gas constant for dry air [lb*ft/sl*K]
@@ -34,18 +36,18 @@ AR = 3.185;
 Beta = sqrt(1-Mach^2);
 eta = C_l_alpha/(2*pi/Beta);
 
-C_L_max = 1.2%.9*1.3*cosd(44.26); %add flap 
+C_L_max = .9*1.3*cosd(44.26); %add flap 
 
 C_L_alpha = (2*pi*AR)/(2+sqrt(4+((AR^2*Beta^2)/eta^2)*(1+tan(LAMDA)^2/Beta^2)))*7.18;
 
-C_L = C_L_alpha*(aplha - alpha 
+C_L = C_L_alpha*(alpha - alpha_0);
 
 C_D0 = .05; %C_D0 = C_fe*(S_wet/S_ref) -- C_fe = .0035 t12.3
 
-v_stall = .3*v_cruise%sqrt(2*w/(rho_sl*C_L_max*S_wing));
+v_stall = sqrt(2*w/(rho_sl*C_L_max*S_wing));
 
 q = 0.5 * rho * v_cruise^2;
-q_stall = 0.5 * rho * v_stall^2;
+q_stall = 0.5 * rho_sl * v_stall^2;
 
 ws_cruise = q*(sqrt((C_D0*pi*AR*e)/3));
 ws_loiter = q*(sqrt(pi*AR*e*C_D0));
