@@ -176,7 +176,7 @@ C_D0_inlet = C_f_inlet*FF_inlet*S_wet_inlet*Q_inlet;
 S_wet = 2*S_wet_wings + 2*S_wet_HT + 2*S_wet_VT + 2*S_wet_fuse + S_wet_canopy + 2*S_wet_inlet;
 
 C_D_misc = 0;
-C_D_LP = 1.04;
+C_D_LP = 0;
 
 C_D0 =  ((2*C_D0_wings + C_D0_fuse + C_D0_canopy + 2*C_D0_inlet + 2*C_D0_HT +2*C_D0_VT)/S_wing) + C_D_misc;
 
@@ -193,3 +193,9 @@ hold off
 title('Total Drag')
 xlabel('Velocity [ft/s]')
 ylabel('Drag Force [lbs]')
+
+figure
+plot(v_range, D0_total)
+hold on
+thrust = 21000*ones(1,100);
+plot(v_range, thrust) 
